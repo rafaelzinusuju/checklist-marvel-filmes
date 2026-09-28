@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checklist Saga Marvel</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:900px;margin:25px auto 50px;padding:0 18px}
+h1{font-family:Georgia,'Times New Roman',serif;text-align:center;font-size:40px;margin:10px 0 28px}
+.top{display:flex;justify-content:flex-end;font-size:13px;font-weight:bold;line-height:1.2;margin-bottom:3px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th,td{border:1px solid #111;height:38px;text-align:center;padding:5px}
+th{font-size:16px}
+td{font-size:14px;font-weight:bold}
+th:nth-child(1),td:nth-child(1){width:55px}
+th:nth-child(2),td:nth-child(2){width:55px}
+th:nth-child(3),td:nth-child(3){width:70px}
+.title{text-decoration:underline;cursor:pointer}
+.check{font-size:22px;color:#25b96f;cursor:pointer;user-select:none}
+input.note{width:58px;border:0;text-align:center;font-weight:bold;font-size:14px;outline:none;background:transparent}
+.done .title{text-decoration:underline}
+.controls{display:flex;gap:8px;justify-content:center;margin:15px 0;flex-wrap:wrap}
+button{border:1px solid #111;background:#fff;padding:8px 14px;cursor:pointer;font-weight:bold}
+button:hover{background:#f2f2f2}
+@media(max-width:600px){h1{font-size:28px}.wrap{padding:0 5px}th,td{height:42px;padding:3px;font-size:12px}th:nth-child(1),td:nth-child(1){width:38px}th:nth-child(2),td:nth-child(2){width:38px}th:nth-child(3),td:nth-child(3){width:55px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Checklist Saga Marvel</h1>
+<div class="controls">
+<button onclick="markAll()">✓ Marcar todos</button>
+<button onclick="clearAll()">Limpar marcações</button>
+<button onclick="window.print()">🖨 Imprimir</button>
+</div>
+<table>
+<thead><tr><th></th><th>✓</th><th>Nota</th><th>Título do Filme</th></tr></thead>
+<tbody id="list"></tbody>
+</table>
+</div>
+<script>
+const titles = ["Capitão América: O Primeiro Vingador", "Homem de Ferro", "Homem de Ferro 2", "O Incrível Hulk", "Thor", "Os Vingadores", "Homem de Ferro 3", "Thor: O Mundo Sombrio", "Capitão América: O Soldado Invernal", "Guardiões da Galáxia", "Guardiões da Galáxia Vol. 2", "Vingadores: Era de Ultron", "Homem-Formiga", "Capitão América: Guerra Civil", "Viúva Negra", "Pantera Negra", "Homem-Aranha: De Volta ao Lar", "Doutor Estranho", "Thor: Ragnarok", "Homem-Formiga e a Vespa", "Vingadores: Guerra Infinita", "Vingadores: Ultimato", "Série: Loki – Temporada 1 (6 EP)", "Série: Loki – Temporada 2 (6 EP)", "Homem-Aranha: Longe de Casa", "Shang-Chi e a Lenda dos Dez Anéis", "Eternos", "Homem-Aranha", "Homem-Aranha 2", "Homem-Aranha 3", "O Espetacular Homem-Aranha", "O Espetacular Homem-Aranha 2: A Ameaça de Electro", "Homem-Aranha: Sem Volta Para Casa", "Venom", "Venom: Tempo de Carnificina", "Venom: A Última Rodada", "Série: WandaVision - [Resumo Ei Nerd]", "Doutor Estranho no Multiverso da Loucura", "Pantera Negra: Wakanda Para Sempre", "Thor: Amor e Trovão", "Homem-Formiga e a Vespa: Quantumania", "Guardiões da Galáxia Vol. 3", "Capitã Marvel", "As Marvels", "Capitão América: Admirável Mundo Novo", "Thunderbolts", "Quarteto Fantástico: Primeiros Passos", "X-Men: Primeira Classe", "X-Men: Dias de um Futuro Esquecido", "X-Men Origens: Wolverine", "X-Men: Apocalipse", "X-Men: Fênix Negra", "X-Men", "X-Men 2", "X-Men: O Confronto Final", "Wolverine: Imortal", "Deadpool", "Logan", "Deadpool 2", "Deadpool & Wolverine", "Motoqueiro Fantasma", "Motoqueiro Fantasma: Espírito de Vingança", "Homem-Aranha: Um Novo Dia (Quando sair o digital)", "Vingadores: Doutor Destino (Dez/2026)"];
+const key = "marvel-checklist-v1";
+let state = JSON.parse(localStorage.getItem(key) || "{}");
+function save(){localStorage.setItem(key,JSON.stringify(state));}
+function render(){
+ const tbody=document.getElementById("list"); tbody.innerHTML="";
+ titles.forEach((title,i)=>{
+   const id=i+1, item=state[id]||{};
+   const tr=document.createElement("tr");
+   if(item.checked) tr.className="done";
+   tr.innerHTML=`<td>${id}</td>
+   <td class="check" onclick="toggle(${id})">${item.checked?"✓":""}</td>
+   <td><input class="note" maxlength="4" value="${item.note||""}" placeholder="" oninput="note(${id},this.value)"></td>
+   <td class="title">${title}</td>`;
+   tbody.appendChild(tr);
+ });
+}
+function toggle(id){state[id]={...(state[id]||{}),checked:!(state[id]&&state[id].checked)};save();render();}
+function note(id,v){state[id]={...(state[id]||{}),note:v};save();}
+function markAll(){titles.forEach((_,i)=>state[i+1]={...(state[i+1]||{}),checked:true});save();render();}
+function clearAll(){titles.forEach((_,i)=>{if(state[i+1])state[i+1].checked=false});save();render();}
+render();
+</script>
+</body>
+</html>
